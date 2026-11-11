@@ -70,10 +70,10 @@ def sqrt(a):
     return math.sqrt(a)
 
 
-def cube(a):
-    """Return a raised to the third power: cube(3) is 27."""
+def cube_of(a):
+    """Return a raised to the third power: cube_of(3) is 27."""
     if not isinstance(a, (int, float)):
         raise TypeError(
-            f"cube() argument 'a' must be a number, not {type(a).__name__}"
+            f"cube_of() argument 'a' must be a number, not {type(a).__name__}"
         )
     return a**3

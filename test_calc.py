@@ -1,6 +1,7 @@
+import math
 import unittest
 
-from calc import add, modulo, multiply, negate, power, subtract
+from calc import absolute, add, modulo, multiply, negate, power, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -167,6 +168,51 @@ class ModuloTest(unittest.TestCase):
         with self.assertRaises(TypeError) as ctx:
             modulo(3, None)
         self.assertIn("'b'", str(ctx.exception))
+        self.assertIn("NoneType", str(ctx.exception))
+
+
+class AbsoluteTest(unittest.TestCase):
+    def test_absolute_negative_whole_number(self):
+        self.assertEqual(absolute(-5), 5)
+
+    def test_absolute_positive_whole_number(self):
+        self.assertEqual(absolute(5), 5)
+
+    def test_absolute_zero(self):
+        self.assertEqual(absolute(0), 0)
+
+    def test_absolute_negative_float(self):
+        self.assertEqual(absolute(-2.5), 2.5)
+
+    def test_absolute_negative_float_zero(self):
+        result = absolute(-0.0)
+        self.assertEqual(result, 0.0)
+        self.assertEqual(math.copysign(1, result), 1.0)
+
+    def test_absolute_keeps_int_and_float_types(self):
+        self.assertIsInstance(absolute(-5), int)
+        self.assertIsInstance(absolute(-2.5), float)
+
+    def test_absolute_rejects_string(self):
+        with self.assertRaises(TypeError) as ctx:
+            absolute("a")
+        self.assertIn("'a'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
+
+    def test_absolute_does_not_convert_numeric_string(self):
+        with self.assertRaises(TypeError):
+            absolute("-5")
+
+    def test_absolute_accepts_bool_as_int(self):
+        self.assertEqual(absolute(True), 1)
+        self.assertIs(type(absolute(True)), int)
+        self.assertEqual(absolute(False), 0)
+        self.assertIs(type(absolute(False)), int)
+
+    def test_absolute_rejects_none(self):
+        with self.assertRaises(TypeError) as ctx:
+            absolute(None)
+        self.assertIn("'a'", str(ctx.exception))
         self.assertIn("NoneType", str(ctx.exception))
 
 

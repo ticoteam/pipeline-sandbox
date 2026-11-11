@@ -45,3 +45,12 @@ def modulo(a, b):
     if b == 0:
         raise ZeroDivisionError("modulo() argument 'b' must not be zero")
     return a % b
+
+
+def absolute(a):
+    """Return a without its sign: absolute(-5) is 5."""
+    if not isinstance(a, (int, float)):
+        raise TypeError(
+            f"absolute() argument 'a' must be a number, not {type(a).__name__}"
+        )
+    return abs(a)

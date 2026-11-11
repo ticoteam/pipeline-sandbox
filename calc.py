@@ -17,3 +17,19 @@ def multiply(a, b):
                 f"multiply() argument '{name}' must be a number, not {type(value).__name__}"
             )
     return a * b
+
+
+def power(a, b):
+    """Return a raised to b. Very large results may raise OverflowError or take a long time."""
+    for name, value in (("a", a), ("b", b)):
+        if not isinstance(value, (int, float)):
+            raise TypeError(
+                f"power() argument '{name}' must be a number, not {type(value).__name__}"
+            )
+    if a == 0 and b < 0:
+        raise ZeroDivisionError(
+            "power() argument 'a' must not be zero when 'b' is negative"
+        )
+    if a < 0 and b % 1 != 0:
+        raise ValueError("power() cannot raise a negative number to a non-whole power")
+    return a**b

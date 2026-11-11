@@ -459,6 +459,11 @@ class DivideTest(unittest.TestCase):
     def test_divide_zero_numerator(self):
         self.assertEqual(divide(0, 5), 0.0)
 
+    def test_divide_rounds_to_10_decimal_places(self):
+        self.assertEqual(divide(1, 3), 0.3333333333)
+        self.assertEqual(divide(2, 3), 0.6666666667)
+        self.assertEqual(divide(0.1, 3), 0.0333333333)
+
     def test_divide_by_zero_names_b(self):
         with self.assertRaises(ZeroDivisionError) as ctx:
             divide(5, 0)

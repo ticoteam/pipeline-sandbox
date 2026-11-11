@@ -47,10 +47,10 @@ def modulo(a, b):
     return a % b
 
 
-def absolute(a):
-    """Return a without its sign: absolute(-5) is 5."""
+def absolute_value(a):
+    """Return a without its sign: absolute_value(-5) is 5."""
     if not isinstance(a, (int, float)):
         raise TypeError(
-            f"absolute() argument 'a' must be a number, not {type(a).__name__}"
+            f"absolute_value() argument 'a' must be a number, not {type(a).__name__}"
         )
     return abs(a)

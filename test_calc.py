@@ -1,6 +1,6 @@
 import unittest
 
-from calc import add, subtract
+from calc import add, multiply, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -26,6 +26,39 @@ class SubtractTest(unittest.TestCase):
             subtract("a", 1)
         with self.assertRaises(TypeError):
             subtract(None, 1)
+
+
+class MultiplyTest(unittest.TestCase):
+    def test_multiply_positive(self):
+        self.assertEqual(multiply(3, 4), 12)
+
+    def test_multiply_negative(self):
+        self.assertEqual(multiply(-3, 4), -12)
+
+    def test_multiply_floats(self):
+        self.assertEqual(multiply(2.5, 2), 5.0)
+
+    def test_multiply_zero(self):
+        self.assertEqual(multiply(7, 0), 0)
+
+    def test_multiply_rejects_non_number_first_argument(self):
+        for bad, name in (("a", "str"), (None, "NoneType")):
+            with self.assertRaises(TypeError) as ctx:
+                multiply(bad, 3)
+            self.assertIn("'a'", str(ctx.exception))
+            self.assertIn(name, str(ctx.exception))
+
+    def test_multiply_rejects_non_number_second_argument(self):
+        with self.assertRaises(TypeError) as ctx:
+            multiply(3, None)
+        self.assertIn("'b'", str(ctx.exception))
+        self.assertIn("NoneType", str(ctx.exception))
+
+    def test_multiply_does_not_repeat_strings(self):
+        with self.assertRaises(TypeError) as ctx:
+            multiply("ab", 3)
+        self.assertIn("'a'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 import unittest
 
-from calc import add, subtract
+from calc import add, negate, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -26,6 +26,27 @@ class SubtractTest(unittest.TestCase):
             subtract("a", 1)
         with self.assertRaises(TypeError):
             subtract(None, 1)
+
+
+class NegateTest(unittest.TestCase):
+    def test_negate_positive(self):
+        self.assertEqual(negate(5), -5)
+
+    def test_negate_negative_float(self):
+        self.assertEqual(negate(-2.5), 2.5)
+
+    def test_negate_zero(self):
+        self.assertEqual(negate(0), 0)
+
+    def test_negate_float_zero(self):
+        self.assertEqual(negate(0.0), 0.0)
+        self.assertEqual(str(negate(0.0)), "-0.0")
+
+    def test_negate_rejects_non_numbers(self):
+        with self.assertRaises(TypeError):
+            negate("a")
+        with self.assertRaises(TypeError):
+            negate(None)
 
 
 if __name__ == "__main__":

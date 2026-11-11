@@ -17,7 +17,7 @@ diff on `pull_request`, the group's diff on `merge_group`. A knob file that merg
 use it again, change its content (for example `echo 61 > knobs/SLOW` after a 60 merged). A PR queued
 behind another one is built on top of it, so it inherits that PR's knobs in its `merge_group` run.
 
-Where the content is an event (`pull_request` or `merge_group`), the knob acts only on that event; empty means both.
+Where the content may name an event (`pull_request` or `merge_group`), the knob acts only on that event; no event means both.
 
 | File | Content | What GitHub does |
 |---|---|---|
@@ -25,7 +25,7 @@ Where the content is an event (`pull_request` or `merge_group`), the knob acts o
 | `knobs/FAIL` | empty, or an event | `checks` red |
 | `knobs/FAIL_IN_QUEUE` | anything | `checks` green on the PR, red in the merge queue: the PR is removed from the queue |
 | `knobs/FLAKY` | empty, or an event | `checks` red on run attempt 1, green on any re-run (`gh run rerun <id> --failed`) |
-| `knobs/SLOW` | seconds (default 60) | `checks` sleeps that long, on the scoped event(s) |
+| `knobs/SLOW` | seconds (default 60), then optionally an event: `120 merge_group` | `checks` sleeps that long |
 | `knobs/HANG` | seconds (default 780) | `merge_group` only: `checks` sleeps 13 minutes then passes. The queue gives up at 10 minutes and removes the PR; the run then goes green anyway |
 | `knobs/TIMEOUT` | empty, or an event | `checks` runs past its own 1-minute `timeout-minutes` |
 | `knobs/CANCEL` | empty, or an event | the run cancels itself: `checks` ends `cancelled` |

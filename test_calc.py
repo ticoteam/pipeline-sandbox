@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from calc import absolute_value, add, modulo, multiply, negate, power, subtract
+from calc import absolute_value, add, modulo, multiply, negate, power, sqrt, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -212,6 +212,45 @@ class AbsoluteValueTest(unittest.TestCase):
     def test_absolute_value_rejects_none(self):
         with self.assertRaises(TypeError) as ctx:
             absolute_value(None)
+        self.assertIn("'a'", str(ctx.exception))
+        self.assertIn("NoneType", str(ctx.exception))
+
+
+class SqrtTest(unittest.TestCase):
+    def test_sqrt_perfect_square(self):
+        result = sqrt(9)
+        self.assertEqual(result, 3.0)
+        self.assertIsInstance(result, float)
+
+    def test_sqrt_non_square(self):
+        self.assertEqual(sqrt(2), 1.4142135623730951)
+
+    def test_sqrt_float(self):
+        self.assertEqual(sqrt(0.25), 0.5)
+
+    def test_sqrt_zero(self):
+        result = sqrt(0)
+        self.assertEqual(result, 0.0)
+        self.assertIsInstance(result, float)
+
+    def test_sqrt_negative_raises_value_error(self):
+        with self.assertRaises(ValueError) as ctx:
+            sqrt(-4)
+        self.assertIn("'a'", str(ctx.exception))
+
+    def test_sqrt_rejects_string(self):
+        with self.assertRaises(TypeError) as ctx:
+            sqrt("9")
+        self.assertIn("'a'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
+
+    def test_sqrt_accepts_bool_as_int(self):
+        self.assertEqual(sqrt(True), 1.0)
+        self.assertEqual(sqrt(False), 0.0)
+
+    def test_sqrt_rejects_none(self):
+        with self.assertRaises(TypeError) as ctx:
+            sqrt(None)
         self.assertIn("'a'", str(ctx.exception))
         self.assertIn("NoneType", str(ctx.exception))
 

@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from calc import absolute_value, add, modulo, multiply, negate, power, sqrt, subtract
+from calc import absolute_value, add, cube_of, modulo, multiply, negate, power, sqrt, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -253,6 +253,36 @@ class SqrtTest(unittest.TestCase):
             sqrt(None)
         self.assertIn("'a'", str(ctx.exception))
         self.assertIn("NoneType", str(ctx.exception))
+
+
+class CubeOfTest(unittest.TestCase):
+    def test_cube_of_positive_int(self):
+        self.assertEqual(cube_of(3), 27)
+
+    def test_cube_of_negative_keeps_sign(self):
+        self.assertEqual(cube_of(-2), -8)
+
+    def test_cube_of_zero(self):
+        self.assertEqual(cube_of(0), 0)
+
+    def test_cube_of_float(self):
+        self.assertEqual(cube_of(1.5), 3.375)
+
+    def test_cube_of_rejects_string(self):
+        with self.assertRaises(TypeError) as ctx:
+            cube_of("3")
+        self.assertIn("'a'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
+
+    def test_cube_of_rejects_none(self):
+        with self.assertRaises(TypeError) as ctx:
+            cube_of(None)
+        self.assertIn("'a'", str(ctx.exception))
+        self.assertIn("NoneType", str(ctx.exception))
+
+    def test_cube_of_accepts_bool_as_int(self):
+        self.assertEqual(cube_of(True), 1)
+        self.assertEqual(cube_of(False), 0)
 
 
 if __name__ == "__main__":

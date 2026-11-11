@@ -68,3 +68,12 @@ def sqrt(a):
     if a < 0:
         raise ValueError("sqrt() argument 'a' must not be negative")
     return math.sqrt(a)
+
+
+def cube_of(a):
+    """Return a raised to the third power: cube_of(3) is 27."""
+    if not isinstance(a, (int, float)):
+        raise TypeError(
+            f"cube_of() argument 'a' must be a number, not {type(a).__name__}"
+        )
+    return a**3

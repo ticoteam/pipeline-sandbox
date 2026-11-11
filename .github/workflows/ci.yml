@@ -1,0 +1,19 @@
+name: ci
+on:
+  pull_request:
+  merge_group:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail on purpose when a FAIL file exists
+        run: |
+          if [ -e FAIL ]; then echo "FAIL file present at repo root"; exit 1; fi
+      - name: Tests
+        run: |
+          python -m unittest -v
+          sleep 15

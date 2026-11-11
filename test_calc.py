@@ -1,6 +1,6 @@
 import unittest
 
-from calc import add, multiply, negate, subtract
+from calc import add, multiply, negate, power, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -80,6 +80,51 @@ class MultiplyTest(unittest.TestCase):
             multiply("ab", 3)
         self.assertIn("'a'", str(ctx.exception))
         self.assertIn("str", str(ctx.exception))
+
+
+class PowerTests(unittest.TestCase):
+    def test_power_positive_whole_numbers(self):
+        self.assertEqual(power(2, 3), 8)
+
+    def test_power_zero_exponent(self):
+        self.assertEqual(power(5, 0), 1)
+
+    def test_power_zero_to_the_zero_is_one(self):
+        self.assertEqual(power(0, 0), 1)
+
+    def test_power_negative_exponent(self):
+        self.assertEqual(power(2, -2), 0.25)
+
+    def test_power_negative_base_whole_exponent(self):
+        self.assertEqual(power(-2, 3), -8)
+
+    def test_power_float_exponent(self):
+        self.assertEqual(power(9, 0.5), 3.0)
+
+    def test_power_zero_base_positive_exponent(self):
+        self.assertEqual(power(0, 5), 0)
+
+    def test_power_zero_base_negative_exponent_raises(self):
+        with self.assertRaises(ZeroDivisionError) as ctx:
+            power(0, -1)
+        self.assertIn("'a'", str(ctx.exception))
+
+    def test_power_negative_base_non_whole_exponent_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            power(-8, 0.5)
+        self.assertTrue(str(ctx.exception))
+
+    def test_power_rejects_non_number_first_argument(self):
+        with self.assertRaises(TypeError) as ctx:
+            power("a", 3)
+        self.assertIn("'a'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
+
+    def test_power_rejects_non_number_second_argument(self):
+        with self.assertRaises(TypeError) as ctx:
+            power(3, None)
+        self.assertIn("'b'", str(ctx.exception))
+        self.assertIn("NoneType", str(ctx.exception))
 
 
 if __name__ == "__main__":

@@ -77,3 +77,15 @@ def cube_of(a):
             f"cube_of() argument 'a' must be a number, not {type(a).__name__}"
         )
     return a**3
+
+
+def floor_divide(a, b):
+    """Return a divided by b, rounded down toward negative infinity: floor_divide(-7, 2) is -4."""
+    for name, value in (("a", a), ("b", b)):
+        if not isinstance(value, (int, float)):
+            raise TypeError(
+                f"floor_divide() argument '{name}' must be a number, not {type(value).__name__}"
+            )
+    if b == 0:
+        raise ZeroDivisionError("floor_divide() argument 'b' must not be zero")
+    return a // b

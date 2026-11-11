@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from calc import absolute_value, add, cube_of, modulo, multiply, negate, power, sqrt, subtract
+from calc import absolute_value, add, cube_of, floor_divide, modulo, multiply, negate, power, sqrt, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -283,6 +283,58 @@ class CubeOfTest(unittest.TestCase):
     def test_cube_of_accepts_bool_as_int(self):
         self.assertEqual(cube_of(True), 1)
         self.assertEqual(cube_of(False), 0)
+
+
+class FloorDivideTest(unittest.TestCase):
+    def test_floor_divide_even(self):
+        self.assertEqual(floor_divide(6, 3), 2)
+
+    def test_floor_divide_rounds_down(self):
+        self.assertEqual(floor_divide(7, 2), 3)
+
+    def test_floor_divide_negative_first_rounds_toward_negative_infinity(self):
+        self.assertEqual(floor_divide(-7, 2), -4)
+
+    def test_floor_divide_negative_second(self):
+        self.assertEqual(floor_divide(7, -2), -4)
+
+    def test_floor_divide_both_negative(self):
+        self.assertEqual(floor_divide(-7, -2), 3)
+
+    def test_floor_divide_smaller_first(self):
+        self.assertEqual(floor_divide(2, 5), 0)
+
+    def test_floor_divide_float_gives_whole_float(self):
+        result = floor_divide(7.5, 2)
+        self.assertEqual(result, 3.0)
+        self.assertIsInstance(result, float)
+
+    def test_floor_divide_ints_give_int(self):
+        self.assertIsInstance(floor_divide(7, 2), int)
+
+    def test_floor_divide_zero_first(self):
+        self.assertEqual(floor_divide(0, 5), 0)
+
+    def test_floor_divide_consistent_with_modulo(self):
+        for a, b in ((7, 2), (-7, 2), (7, -2), (-7, -2)):
+            self.assertEqual(floor_divide(a, b) * b + modulo(a, b), a)
+
+    def test_floor_divide_zero_second_raises(self):
+        with self.assertRaises(ZeroDivisionError) as ctx:
+            floor_divide(5, 0)
+        self.assertIn("'b'", str(ctx.exception))
+
+    def test_floor_divide_rejects_string_first(self):
+        with self.assertRaises(TypeError) as ctx:
+            floor_divide("a", 3)
+        self.assertIn("'a'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
+
+    def test_floor_divide_rejects_none_second(self):
+        with self.assertRaises(TypeError) as ctx:
+            floor_divide(3, None)
+        self.assertIn("'b'", str(ctx.exception))
+        self.assertIn("NoneType", str(ctx.exception))
 
 
 if __name__ == "__main__":

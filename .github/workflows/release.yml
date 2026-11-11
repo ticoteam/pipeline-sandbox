@@ -1,6 +1,10 @@
 name: release
 # Tags vN and publishes a release. `mode` picks a failure; see README.md.
+# Also runs on every merge to main (mode normal), so the repository releases on its own: Tico's Release stage then
+# only waits (In a release with no "Release with" set). Remove the push trigger to test Tico cutting the release.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       mode:

@@ -8,7 +8,7 @@ the ways we have seen it fail. Nothing here ships.
   PR only (`gh pr merge --admin`), as on ticoteam/tico. Nobody can push to main.
 - Workflow `ci` runs on `pull_request` and `merge_group`: job `knobs` reads the knob files, then `checks` (required),
   `advisory` (not required) and, when asked, `shards` (not required). A plain run takes about 30 seconds.
-- Workflow `release` (run by hand) tags `vN` and publishes a release. `shadow` runs only for knobs/SHADOW_RED.
+- Workflow `release` (on every merge to main, or run by hand) tags `vN` and publishes a release. `shadow` runs only for knobs/SHADOW_RED.
 
 ## Knobs
 

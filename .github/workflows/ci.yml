@@ -1,19 +1,107 @@
 name: ci
+# Knobs: see README.md. `checks` is the one required check.
 on:
   pull_request:
+    paths-ignore:
+      - knobs/NO_CHECK # a PR that changes only this file gets no run, so `checks` never reports
   merge_group:
 permissions:
   contents: read
+concurrency:
+  # Like ticoteam/tico: a new push cancels the PR's older run. Queue runs are never cancelled by this.
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
-  checks:
+  knobs:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 2
+    permissions:
+      contents: read
+      statuses: write
+    outputs:
+      fail: ${{ steps.read.outputs.fail }}
+      sleep: ${{ steps.read.outputs.sleep }}
+      timeout: ${{ steps.read.outputs.timeout }}
+      runner: ${{ steps.read.outputs.runner }}
+      skip: ${{ steps.read.outputs.skip }}
+      cancel: ${{ steps.read.outputs.cancel }}
+      flaky: ${{ steps.read.outputs.flaky }}
+      advisory: ${{ steps.read.outputs.advisory }}
+      shards: ${{ steps.read.outputs.shards }}
     steps:
       - uses: actions/checkout@v4
-      - name: Fail on purpose when a FAIL file exists
+        with:
+          fetch-depth: 0
+      - id: read
+        env:
+          MERGE_GROUP_BASE: ${{ github.event.merge_group.base_sha }}
+        run: bash scripts/knobs.sh
+      - name: Commit status (knobs/STATUS)
+        if: steps.read.outputs.status != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATE: ${{ steps.read.outputs.status }}
+          SHA: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
         run: |
-          if [ -e FAIL ]; then echo "FAIL file present at repo root"; exit 1; fi
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$SHA" -f state="$STATE" -f context=sandbox/status \
+            -f description="knobs/STATUS says $STATE"
+
+  checks:
+    needs: knobs
+    # Runs even when `knobs` failed, so a broken knobs job turns `checks` red instead of skipped (skipped = green).
+    if: ${{ !cancelled() && needs.knobs.outputs.skip != 'true' }}
+    runs-on: ${{ needs.knobs.outputs.runner || 'ubuntu-latest' }}
+    timeout-minutes: ${{ fromJSON(needs.knobs.outputs.timeout || '30') }}
+    permissions:
+      contents: read
+      actions: write # knobs/CANCEL cancels its own run
+    steps:
+      - uses: actions/checkout@v4
+      - name: Knobs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KNOBS_RESULT: ${{ needs.knobs.result }}
+          FAIL: ${{ needs.knobs.outputs.fail }}
+          SLEEP: ${{ needs.knobs.outputs.sleep }}
+          CANCEL: ${{ needs.knobs.outputs.cancel }}
+          FLAKY: ${{ needs.knobs.outputs.flaky }}
+        run: |
+          [ "$KNOBS_RESULT" = success ] || { echo "the knobs job did not succeed"; exit 1; }
+          if [ "$CANCEL" = true ]; then
+            echo "knobs/CANCEL: cancelling run $GITHUB_RUN_ID"; gh run cancel "$GITHUB_RUN_ID" -R "$GITHUB_REPOSITORY"; sleep 60
+          fi
+          if [ "${SLEEP:-0}" -gt 0 ]; then echo "Sleeping $SLEEP s"; sleep "$SLEEP"; fi
+          if [ "$FLAKY" = true ] && [ "$GITHUB_RUN_ATTEMPT" = 1 ]; then
+            echo "knobs/FLAKY: attempt 1 fails; re-run this job and it passes"; exit 1
+          fi
+          if [ -n "$FAIL" ]; then echo "Failing on purpose: $FAIL"; exit 1; fi
       - name: Tests
+        run: python -m unittest -v
+
+  advisory:
+    # Not required. Red only with knobs/ADVISORY_RED: GitHub merges anyway, Tico's Checks pass counts every check.
+    needs: knobs
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - env:
+          RED: ${{ needs.knobs.outputs.advisory }}
         run: |
-          python -m unittest -v
-          sleep 15
+          if [ "$RED" = true ]; then echo "knobs/ADVISORY_RED"; exit 1; fi
+
+  shards:
+    # Not required. With knobs/SHARDS: shard 1 fails and fail-fast cancels shards 2 and 3.
+    needs: knobs
+    if: needs.knobs.outputs.shards == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    strategy:
+      fail-fast: true
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          if [ "$SHARD" = 1 ]; then sleep 5; echo "shard 1 fails"; exit 1; fi
+          sleep 90

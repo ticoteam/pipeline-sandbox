@@ -1,0 +1,17 @@
+name: shadow
+# A second workflow whose job is ALSO named `checks`. It runs only on a PR that changes knobs/SHADOW_RED, and fails, so
+# that PR's head has two check runs named `checks`: one green (ci), one red (this). Never on merge_group.
+on:
+  pull_request:
+    paths:
+      - knobs/SHADOW_RED
+permissions:
+  contents: read
+jobs:
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: |
+          echo "knobs/SHADOW_RED: a second check run named checks, red"; exit 1

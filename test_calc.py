@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from calc import absolute_value, add, cube_of, floor_divide, modulo, multiply, negate, power, sqrt, subtract
+from calc import absolute_value, add, clamp, cube_of, floor_divide, modulo, multiply, negate, power, sqrt, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -335,6 +335,64 @@ class FloorDivideTest(unittest.TestCase):
             floor_divide(3, None)
         self.assertIn("'b'", str(ctx.exception))
         self.assertIn("NoneType", str(ctx.exception))
+
+
+class ClampTest(unittest.TestCase):
+    def test_clamp_inside_range_returns_x(self):
+        self.assertEqual(clamp(5, 0, 10), 5)
+
+    def test_clamp_above_range_returns_high(self):
+        self.assertEqual(clamp(15, 0, 10), 10)
+
+    def test_clamp_below_range_returns_low(self):
+        self.assertEqual(clamp(-5, 0, 10), 0)
+
+    def test_clamp_x_equal_to_low(self):
+        self.assertEqual(clamp(0, 0, 10), 0)
+
+    def test_clamp_x_equal_to_high(self):
+        self.assertEqual(clamp(10, 0, 10), 10)
+
+    def test_clamp_low_equal_to_high(self):
+        self.assertEqual(clamp(7, 3, 3), 3)
+
+    def test_clamp_negative_range(self):
+        self.assertEqual(clamp(-5, -10, -1), -5)
+        self.assertEqual(clamp(0, -10, -1), -1)
+
+    def test_clamp_floats(self):
+        self.assertEqual(clamp(2.5, 0.0, 1.5), 1.5)
+        self.assertEqual(clamp(0.25, 0.0, 1.0), 0.25)
+
+    def test_clamp_mixed_keeps_original_value_and_type(self):
+        result = clamp(5, 0.5, 10)
+        self.assertEqual(result, 5)
+        self.assertIsInstance(result, int)
+        self.assertEqual(clamp(-5, 0.5, 10), 0.5)
+
+    def test_clamp_low_greater_than_high_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            clamp(5, 10, 0)
+        self.assertIn("'low'", str(ctx.exception))
+        self.assertIn("'high'", str(ctx.exception))
+
+    def test_clamp_rejects_string_x(self):
+        with self.assertRaises(TypeError) as ctx:
+            clamp("a", 0, 10)
+        self.assertIn("'x'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
+
+    def test_clamp_rejects_none_low(self):
+        with self.assertRaises(TypeError) as ctx:
+            clamp(5, None, 10)
+        self.assertIn("'low'", str(ctx.exception))
+        self.assertIn("NoneType", str(ctx.exception))
+
+    def test_clamp_rejects_string_high(self):
+        with self.assertRaises(TypeError) as ctx:
+            clamp(5, 0, "z")
+        self.assertIn("'high'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
 
 
 if __name__ == "__main__":

@@ -108,3 +108,15 @@ def clamp(x, low, high):
     if x > high:
         return high
     return x
+
+
+def sign(x):
+    """Return -1, 0 or 1 for a negative, zero or positive x as an int: sign(-7) is -1.
+
+    NaN compares false both ways, so sign(nan) is 0.
+    """
+    if not isinstance(x, (int, float)):
+        raise TypeError(
+            f"sign() argument 'x' must be a number, not {type(x).__name__}"
+        )
+    return (x > 0) - (x < 0)

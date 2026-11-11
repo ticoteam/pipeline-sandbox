@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from calc import absolute_value, add, clamp, cube_of, floor_divide, modulo, multiply, negate, power, sqrt, subtract
+from calc import absolute_value, add, clamp, cube_of, floor_divide, modulo, multiply, negate, power, sign, sqrt, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -393,6 +393,54 @@ class ClampTest(unittest.TestCase):
             clamp(5, 0, "z")
         self.assertIn("'high'", str(ctx.exception))
         self.assertIn("str", str(ctx.exception))
+
+
+class SignTest(unittest.TestCase):
+    def test_sign_negative_int(self):
+        self.assertEqual(sign(-7), -1)
+
+    def test_sign_positive_int(self):
+        self.assertEqual(sign(7), 1)
+
+    def test_sign_zero(self):
+        self.assertEqual(sign(0), 0)
+
+    def test_sign_negative_float(self):
+        self.assertEqual(sign(-2.5), -1)
+
+    def test_sign_positive_float_gives_int(self):
+        result = sign(2.5)
+        self.assertEqual(result, 1)
+        self.assertIsInstance(result, int)
+
+    def test_sign_float_zero_either_sign(self):
+        self.assertEqual(sign(0.0), 0)
+        self.assertEqual(sign(-0.0), 0)
+        self.assertIsInstance(sign(-0.0), int)
+
+    def test_sign_tiny_floats(self):
+        self.assertEqual(sign(1e-300), 1)
+        self.assertEqual(sign(-1e-300), -1)
+
+    def test_sign_rejects_string(self):
+        with self.assertRaises(TypeError) as ctx:
+            sign("a")
+        self.assertIn("'x'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
+
+    def test_sign_does_not_convert_numeric_string(self):
+        with self.assertRaises(TypeError):
+            sign("-5")
+
+    def test_sign_rejects_none(self):
+        with self.assertRaises(TypeError) as ctx:
+            sign(None)
+        self.assertIn("'x'", str(ctx.exception))
+        self.assertIn("NoneType", str(ctx.exception))
+
+    def test_sign_accepts_bool(self):
+        self.assertEqual(sign(True), 1)
+        self.assertEqual(sign(False), 0)
 
 
 if __name__ == "__main__":

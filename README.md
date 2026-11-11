@@ -39,6 +39,13 @@ Where the content may name an event (`pull_request` or `merge_group`), the knob 
 | `knobs/PAIR_A` + `knobs/PAIR_B` | anything | each alone is green. `checks` is red when both are in the tree and the run changes one: two PRs that pass alone fail when grouped in the queue, and the second stays red after the first merges |
 | `conflict.txt` | one line | edit line 1 in two PRs: whichever merges second conflicts |
 
+Two PRs that both add the same knob file with different content conflict with each other (add/add) once one merges;
+queue them one at a time, or use different knobs. `knobs/HANG` keeps a PR in the queue for 10 minutes, which is the
+easy way to act on a queued PR (close, dequeue, delete its branch).
+
+GitHub refuses any push to the branch of a queued PR: "Branches that are queued for merging cannot be updated. To
+modify this branch, dequeue the associated pull request." So a force-push after queueing needs a dequeue first.
+
 Pushing twice quickly to a PR cancels the older `ci` run (`cancel-in-progress` on `pull_request`, like ticoteam/tico).
 
 ## Hand actions (not CI)

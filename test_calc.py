@@ -255,7 +255,6 @@ class SqrtTest(unittest.TestCase):
         self.assertIn("NoneType", str(ctx.exception))
 
 
-
 class CubeTest(unittest.TestCase):
     def test_cube_positive_int(self):
         self.assertEqual(cube(3), 27)

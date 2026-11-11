@@ -1,6 +1,26 @@
 name: release
+# Tags vN and publishes a release. `mode` picks a failure; see README.md.
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: What this run does
+        type: choice
+        default: normal
+        options:
+          - normal # tag v<N+1> at the target and publish a release
+          - fail # fail before tagging: no tag, no release
+          - tag-exists # try to publish the newest existing tag again: GitHub refuses
+          - slow # sleep slow_seconds, then normal
+          - tag-only # push the tag, then fail before the release: a tag with no release (Nov 5 v0.5.160)
+          - draft # a draft release: not published
+          - prerelease # tag v<N+1>-rc.1 marked pre-release
+      target:
+        description: Commit or ref to release (main~1 makes a release that misses the newest merge)
+        default: main
+      slow_seconds:
+        description: Seconds to sleep in slow mode
+        default: "300"
 permissions:
   contents: write
 concurrency:
@@ -9,18 +29,32 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-      - name: Tag vN and create the release
+      - name: Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MODE: ${{ inputs.mode }}
+          TARGET: ${{ inputs.target }}
+          SLOW: ${{ inputs.slow_seconds }}
         run: |
+          set -euo pipefail
           last=$(git tag --list 'v*' | grep -E '^v[0-9]+$' | sed 's/^v//' | sort -n | tail -1)
           next="v$(( ${last:-0} + 1 ))"
-          sha=$(git rev-parse HEAD)
-          echo "Releasing $next at $sha"
-          gh release create "$next" --target "$sha" --title "$next" --generate-notes
+          sha=$(git rev-parse --verify "${TARGET:-main}^{commit}")
+          echo "mode=$MODE last=v${last:-0} next=$next target=${TARGET:-main} sha=$sha"
+          case "$MODE" in
+            fail) echo "release: failing on purpose before tagging"; exit 1 ;;
+            tag-exists) gh release create "v${last:-0}" --target "$sha" --title "v${last:-0}" --notes "again" ;;
+            slow) sleep "$SLOW"; gh release create "$next" --target "$sha" --title "$next" --generate-notes ;;
+            tag-only)
+              git tag "$next" "$sha"; git push origin "refs/tags/$next"
+              echo "release: tag $next pushed, failing before the release"; exit 1 ;;
+            draft) gh release create "$next" --target "$sha" --title "$next" --generate-notes --draft ;;
+            prerelease) gh release create "$next-rc.1" --target "$sha" --title "$next-rc.1" --generate-notes --prerelease ;;
+            *) gh release create "$next" --target "$sha" --title "$next" --generate-notes ;;
+          esac

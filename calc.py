@@ -6,6 +6,10 @@ def subtract(a, b):
     return a - b
 
 
+def negate(x):
+    return -x
+
+
 def multiply(a, b):
     for name, value in (("a", a), ("b", b)):
         if not isinstance(value, (int, float)):

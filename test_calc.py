@@ -1,6 +1,6 @@
 import unittest
 
-from calc import add, multiply, negate, power, subtract
+from calc import add, modulo, multiply, negate, power, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -123,6 +123,49 @@ class PowerTests(unittest.TestCase):
     def test_power_rejects_non_number_second_argument(self):
         with self.assertRaises(TypeError) as ctx:
             power(3, None)
+        self.assertIn("'b'", str(ctx.exception))
+        self.assertIn("NoneType", str(ctx.exception))
+
+
+class ModuloTest(unittest.TestCase):
+    def test_modulo_positive(self):
+        self.assertEqual(modulo(7, 3), 1)
+
+    def test_modulo_even_division(self):
+        self.assertEqual(modulo(6, 3), 0)
+
+    def test_modulo_first_smaller(self):
+        self.assertEqual(modulo(2, 5), 2)
+
+    def test_modulo_negative_first_takes_sign_of_b(self):
+        self.assertEqual(modulo(-7, 3), 2)
+
+    def test_modulo_negative_second_takes_sign_of_b(self):
+        self.assertEqual(modulo(7, -3), -2)
+
+    def test_modulo_floats(self):
+        self.assertEqual(modulo(5.5, 2), 1.5)
+
+    def test_modulo_ints_give_int(self):
+        self.assertIsInstance(modulo(7, 3), int)
+
+    def test_modulo_zero_first(self):
+        self.assertEqual(modulo(0, 5), 0)
+
+    def test_modulo_zero_second_raises(self):
+        with self.assertRaises(ZeroDivisionError) as ctx:
+            modulo(5, 0)
+        self.assertIn("'b'", str(ctx.exception))
+
+    def test_modulo_rejects_non_number_first_argument(self):
+        with self.assertRaises(TypeError) as ctx:
+            modulo("a", 3)
+        self.assertIn("'a'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
+
+    def test_modulo_rejects_non_number_second_argument(self):
+        with self.assertRaises(TypeError) as ctx:
+            modulo(3, None)
         self.assertIn("'b'", str(ctx.exception))
         self.assertIn("NoneType", str(ctx.exception))
 

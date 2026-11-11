@@ -33,3 +33,15 @@ def power(a, b):
     if a < 0 and b % 1 != 0:
         raise ValueError("power() cannot raise a negative number to a non-whole power")
     return a**b
+
+
+def modulo(a, b):
+    """Return the remainder of a divided by b, with the sign of b: modulo(-7, 3) is 2."""
+    for name, value in (("a", a), ("b", b)):
+        if not isinstance(value, (int, float)):
+            raise TypeError(
+                f"modulo() argument '{name}' must be a number, not {type(value).__name__}"
+            )
+    if b == 0:
+        raise ZeroDivisionError("modulo() argument 'b' must not be zero")
+    return a % b

@@ -89,3 +89,22 @@ def floor_divide(a, b):
     if b == 0:
         raise ZeroDivisionError("floor_divide() argument 'b' must not be zero")
     return a // b
+
+
+def clamp(x, low, high):
+    """Return x limited to the range low to high: clamp(15, 0, 10) is 10.
+
+    The result is x, low or high unchanged, so its type can be int or float. low must not be greater than high.
+    """
+    for name, value in (("x", x), ("low", low), ("high", high)):
+        if not isinstance(value, (int, float)):
+            raise TypeError(
+                f"clamp() argument '{name}' must be a number, not {type(value).__name__}"
+            )
+    if low > high:
+        raise ValueError("clamp() argument 'low' must not be greater than 'high'")
+    if x < low:
+        return low
+    if x > high:
+        return high
+    return x

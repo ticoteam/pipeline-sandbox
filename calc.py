@@ -1,3 +1,6 @@
+import math
+
+
 def add(a, b):
     return a + b
 
@@ -54,3 +57,14 @@ def absolute_value(a):
             f"absolute_value() argument 'a' must be a number, not {type(a).__name__}"
         )
     return abs(a)
+
+
+def sqrt(a):
+    """Return the square root of a as a float: sqrt(9) is 3.0. A negative a raises ValueError."""
+    if not isinstance(a, (int, float)):
+        raise TypeError(
+            f"sqrt() argument 'a' must be a number, not {type(a).__name__}"
+        )
+    if a < 0:
+        raise ValueError("sqrt() argument 'a' must not be negative")
+    return math.sqrt(a)

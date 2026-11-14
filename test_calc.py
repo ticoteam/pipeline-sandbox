@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from calc import absolute_value, add, clamp, cube_of, floor_divide, modulo, multiply, negate, power, sign, sqrt, subtract
+from calc import absolute_value, add, clamp, divide, cube_of, floor_divide, modulo, multiply, negate, power, sign, sqrt, subtract
 
 
 class AddTest(unittest.TestCase):
@@ -441,6 +441,45 @@ class SignTest(unittest.TestCase):
     def test_sign_accepts_bool(self):
         self.assertEqual(sign(True), 1)
         self.assertEqual(sign(False), 0)
+
+
+class DivideTest(unittest.TestCase):
+    def test_divide_positive(self):
+        self.assertEqual(divide(12, 4), 3.0)
+
+    def test_divide_not_whole(self):
+        self.assertEqual(divide(7, 2), 3.5)
+
+    def test_divide_negative(self):
+        self.assertEqual(divide(-12, 4), -3.0)
+
+    def test_divide_floats(self):
+        self.assertEqual(divide(5.0, 2.5), 2.0)
+
+    def test_divide_zero_numerator(self):
+        self.assertEqual(divide(0, 5), 0.0)
+
+    def test_divide_rounds_to_10_decimal_places(self):
+        self.assertEqual(divide(1, 3), 0.3333333333)
+        self.assertEqual(divide(2, 3), 0.6666666667)
+        self.assertEqual(divide(0.1, 3), 0.0333333333)
+
+    def test_divide_by_zero_names_b(self):
+        with self.assertRaises(ZeroDivisionError) as ctx:
+            divide(5, 0)
+        self.assertIn("'b'", str(ctx.exception))
+
+    def test_divide_rejects_non_number_first_argument(self):
+        with self.assertRaises(TypeError) as ctx:
+            divide("a", 3)
+        self.assertIn("'a'", str(ctx.exception))
+        self.assertIn("str", str(ctx.exception))
+
+    def test_divide_rejects_non_number_second_argument(self):
+        with self.assertRaises(TypeError) as ctx:
+            divide(3, None)
+        self.assertIn("'b'", str(ctx.exception))
+        self.assertIn("NoneType", str(ctx.exception))
 
 
 if __name__ == "__main__":

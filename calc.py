@@ -120,3 +120,14 @@ def sign(x):
             f"sign() argument 'x' must be a number, not {type(x).__name__}"
         )
     return (x > 0) - (x < 0)
+
+
+def divide(a, b):
+    for name, value in (("a", a), ("b", b)):
+        if not isinstance(value, (int, float)):
+            raise TypeError(
+                f"divide() argument '{name}' must be a number, not {type(value).__name__}"
+            )
+    if b == 0:
+        raise ZeroDivisionError("divide() argument 'b' must not be zero")
+    return round(a / b, 10)
